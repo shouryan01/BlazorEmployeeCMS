@@ -1,14 +1,25 @@
 @page "/addcontact"
 @inject HttpClient HttpClient
 @inject NavigationManager NavigationManager
+@inject IJSRuntime JsRuntime
+@using Microsoft.Extensions.Logging
+
 
 <form>
   <div class="form-group">
-    <label class="form-text" for="fname">First name:</label>
-    <input class="form-control" type="text" id="fname" name="fname" @bind="c.FirstName">
+    @* <label class="form-text" for="fname">First name:</label> *@
+    @if (c.FirstName == null)
+    {
+      <span class="text-danger">First name is required</span>
+    }
+    <input class="form-control" type="text" id="fname" name="fname" @bind="c.FirstName" placeholder="Enter FirstName">
 
-    <label class="form-text" for="lname">Last name:</label>
-    <input class="form-control" type="text" id="lname" name="lname" @bind="c.LastName">
+    @if (c.LastName == null)
+    {
+      <span class="text-danger">Last name is required</span>
+    }
+    @* <label class="form-text" for="lname">Last name:</label> *@
+    <input class="form-control" type="text" id="lname" name="lname" @bind="c.LastName"  placeholder="Enter LastName">
 
     <label class="form-text" for="phone">Enter your phone number:</label>
     <input class="form-control" type="tel" id="phone" name="phone" pattern="[0-9]{3}-[0-9]{3}-[0-9]{4}" @bind="c.PhoneNumber">
@@ -27,7 +38,15 @@
     [Parameter] public Contact c { get; set; } = new Contact();
     
     protected async Task Add()
-    {
-          var response = await HttpClient.PostAsJsonAsync(NavigationManager.BaseUri + "contacts", c);
+    {	
+		if (c.FirstName == null || c.LastName == null)
+		{
+			Console.WriteLine("Please enter a first and last name");
+			await JsRuntime.InvokeVoidAsync("alert", "Please fill all the fields");
+		}
+		else
+		{
+        	var response = await HttpClient.PostAsJsonAsync(NavigationManager.BaseUri + "contacts", c);
+		}
     }
 }

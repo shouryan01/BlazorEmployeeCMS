@@ -1,8 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using epitec.Data;
-using Newtonsoft.Json;
-using System.Text;
 namespace epitec.Controllers;
 
 [Route("contacts")]
@@ -19,7 +17,8 @@ public class ContactController : Controller
     [HttpGet]
     public async Task<ActionResult<List<Contact>>> GetContacts()
     {
-        return (await _db.Contacts.ToListAsync()).OrderBy(s => s.LastName).ToList();
+        return (await _db.Contacts.ToListAsync()).ToList();
+        // .OrderBy(s => s.LastName)
     }
 
     [HttpPost]
@@ -31,7 +30,7 @@ public class ContactController : Controller
     }
 
     [HttpGet("{Id}")]
-    public async Task<ActionResult<Contact>> GetContactPage(int Id)
+    public async Task<ActionResult<Contact>> GetContactPage(Guid Id)
     {
         // Console.WriteLine(contactId);
         var order = await _db.Contacts
@@ -46,8 +45,8 @@ public class ContactController : Controller
         return order;
     }
 
-    [HttpDelete("{Id:int}")]
-    public async Task<ActionResult<Contact>> DeleteContact(int Id)
+    [HttpDelete("{Id}")]
+    public async Task<ActionResult<Contact>> DeleteContact(Guid Id)
     {
         var contact = await _db.Contacts.FindAsync(Id);
         if (contact == null)
@@ -62,8 +61,8 @@ public class ContactController : Controller
     }
 
 
-    [HttpPut("{Id:int}")]
-    public async Task<ActionResult<Contact>> UpdateContact(int Id, Contact c)
+    [HttpPut("{Id}")]
+    public async Task<ActionResult<Contact>> UpdateContact(Guid Id, Contact c)
     {
         var contact = await _db.Contacts.FindAsync(Id);
         if (contact == null)

@@ -1,10 +1,9 @@
 using System.ComponentModel.DataAnnotations;
-
 namespace epitec;
 
 public class Contact
     {
-        public int Id { get; set; }
+        public Guid Id { get; set; }
 
         [Required]
         [StringLength(250)]
