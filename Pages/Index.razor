@@ -1,0 +1,70 @@
+﻿@page "/"
+@inject HttpClient HttpClient
+@inject NavigationManager NavigationManager
+@inject IJSRuntime JsRuntime
+
+
+<div class="main">
+  <h1>Epitec CMS</h1>
+  <ul class="pizza-cards">
+    @if (contacts != null)
+    {
+		<table class="table table-striped">
+			<thead>
+				<tr>
+					<th scope="col">Last Name</th>
+					<th scope="col">First Name</th>
+					<th scope="col">Birth Date</th>
+					<th scope="col">Phone No.</th>
+					<th scope="col">Action</th>
+				</tr>
+			</thead>
+			<tbody>
+			@foreach (var contact in contacts)
+			{
+					<tr>
+						<td><input type="text" @bind="contact.LastName"></input></td>
+						<td><input type="text" @bind="contact.FirstName"></td>
+						<td><input type="text" @bind="contact.BirthDate"></td>
+						<td><input type="text" @bind="contact.PhoneNumber"></td>
+						<td>
+							<button class="btn btn-warning" @onclick="() => EditContact(contact)">Edit</button>
+							<button class="btn btn-danger" @onclick="() => DeleteContact(contact.Id)">Delete</button>
+						</td>
+					</tr>
+			}
+			</tbody>
+	  </table>
+    }
+  </ul>
+</div>
+
+@code {
+    List<Contact> contacts = new();
+
+	protected override async Task OnInitializedAsync()
+	{
+		contacts = await HttpClient.GetFromJsonAsync<List<Contact>>(NavigationManager.BaseUri + "contacts");
+	}
+	
+	protected async void EditContact(Contact x)
+	{	
+		var response = await HttpClient.PutAsJsonAsync<Contact>(NavigationManager.BaseUri + "contacts/" + x.Id, x);
+		if (response.IsSuccessStatusCode)
+		{
+			NavigationManager.NavigateTo("refresh");
+		}
+	}
+
+	protected async void DeleteContact(int id)
+	{
+		bool confirmed = await JsRuntime.InvokeAsync<bool>("confirm", "Are you sure you want to delete?");
+		if (confirmed) {
+			var response = await HttpClient.DeleteAsync(NavigationManager.BaseUri + "contacts/" + id);
+			if (response.IsSuccessStatusCode)
+			{
+				NavigationManager.NavigateTo("refresh");
+			}
+		}
+	}
+}

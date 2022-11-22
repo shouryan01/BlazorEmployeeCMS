@@ -1,0 +1,33 @@
+@page "/addcontact"
+@inject HttpClient HttpClient
+@inject NavigationManager NavigationManager
+
+<form>
+  <div class="form-group">
+    <label class="form-text" for="fname">First name:</label>
+    <input class="form-control" type="text" id="fname" name="fname" @bind="c.FirstName">
+
+    <label class="form-text" for="lname">Last name:</label>
+    <input class="form-control" type="text" id="lname" name="lname" @bind="c.LastName">
+
+    <label class="form-text" for="phone">Enter your phone number:</label>
+    <input class="form-control" type="tel" id="phone" name="phone" pattern="[0-9]{3}-[0-9]{3}-[0-9]{4}" @bind="c.PhoneNumber">
+
+    <label class="form-text" for="birthday">BirthDate:</label>
+    <input class="form-control" type="date" id="birthday" name="birthday" @bind="c.BirthDate">
+    
+    <br />
+    
+    <button type="submit" class="btn btn-primary" value="Submit" @onclick="Add">Submit</button>
+  </div>
+</form>
+
+@code
+{
+    [Parameter] public Contact c { get; set; } = new Contact();
+    
+    protected async Task Add()
+    {
+          var response = await HttpClient.PostAsJsonAsync(NavigationManager.BaseUri + "contacts", c);
+    }
+}
